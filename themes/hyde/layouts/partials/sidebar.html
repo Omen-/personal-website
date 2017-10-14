@@ -9,7 +9,7 @@
 
     <ul class="sidebar-nav">
       <li><a href="{{ .Site.BaseURL }}">Home</a> </li>
-      {{ range .Site.Menus.main -}}
+      {{ range .Site.Menus.main.ByWeight -}}
         <li><a href="{{.URL}}"> {{ .Name }} </a></li>
       {{- end }}
     </ul>

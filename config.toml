@@ -1,4 +1,12 @@
 baseURL = "http://omen-.github.io/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "Arthur Bellal"
 theme = "hyde"
+
+[params]
+  description = "Stories on how I construct or break stuff"
+
+[[menu.main]]
+  name = "Resume"
+  weight = 3
+  url = "/resume.pdf"
