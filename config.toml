@@ -2,6 +2,7 @@ baseURL = "http://omen-.github.io/"
 languageCode = "en-us"
 title = "Arthur Bellal"
 theme = "hyde"
+googleAnalytics = "UA-108126571-1"
 
 [params]
   description = "Stories on how I construct or break stuff"
