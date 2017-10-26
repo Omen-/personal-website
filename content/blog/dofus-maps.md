@@ -6,7 +6,7 @@ draft: false
 
 **TL;DR**
 
-A few years ago I found a way to retrieve unknown dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
+A few years ago I found a way to retrieve unknown Dofus maps keys by exploiting a badly designed XOR encryption. Recently other people achieved the same thing by using statistical based attacks. It got me motivated to share my research with the community.
 
 You can find an implementation of the attack described here on my [github](https://github.com/Omen-/dofus-key-finder).
 
@@ -18,7 +18,7 @@ You can find an implementation of the attack described here on my [github](https
 
 [Wikipedia - Dofus](https://en.wikipedia.org/wiki/Dofus)
 
-In 2010, Ankama Games reveal a major update of dofus, Dofus 2.0, with updated graphics and new content. This new version was not well received by the community and it resulted significant loss in the playerbase. 
+In 2010, Ankama Games reveal a major update of Dofus, Dofus 2.0, with updated graphics and new content. This new version was not well received by the community and it resulted significant loss in the playerbase. 
 
 ![dofus](/images/dofus-maps/dofus2-4.png#center)
 <center>*Dofus 1.29 / 2.0* - Copyright © 2017 Ankama Games</center>
@@ -31,9 +31,9 @@ To protect some of his assets against data mining and private servers, Ankama Ga
 
 When the player enters a map, the server sends him the decryption key. The game client uses this key to decrypt the map and then displays it.
 
-In order to obtain the key for a certain map, you need to be able to access this map. There is no way to cheat this system. If there was one it would also be a game-breaking bug that lets you teleport on any map.
+In order to get the key for a certain map, you need to access this map. There is no way to cheat this system. If there was one it would also be a game-breaking bug that lets you teleport on any map.
 
-If you send the wrong key to the client, the map will not be displayed properly.
+If you send the wrong key to the client, the map is not displayed properly.
 
 ![bad key](/images/dofus-maps/bad-key.png#center)
 <center>*Not quite correct key* - Copyright © 2017 Ankama Games</center>
@@ -63,7 +63,7 @@ function (data, key, c)
 }
 ```
 
-As you may be able to see, this is almost a standard [XOR cipher](https://en.wikipedia.org/wiki/XOR_cipher) algorithm. The only difference is the parameter called `c` wich adds an offset to the key. This is probably an attempt to make the algorithm safer but nothing happens in practice. You do not need to understand why to continue with the rest of this post and can just ignore this but it only means that we will need to apply a [circular shift](https://en.wikipedia.org/wiki/Circular_shift) on the key before sending it to the client.
+As you may be able to see, this is almost a standard [XOR cipher](https://en.wikipedia.org/wiki/XOR_cipher) algorithm. The only difference is the parameter called `c` wich adds an offset to the key index. This is probably an attempt to make the algorithm safer but does nothing in practice. You do not need to understand why to continue with the rest of this post and can just ignore this but it only means that we will need to apply a [circular shift](https://en.wikipedia.org/wiki/Circular_shift) on the key before sending it to the client.
 
 [XOR cipher](https://en.wikipedia.org/wiki/XOR_cipher) can be a strong encryption algorithm if the following conditions are met:
 
@@ -87,7 +87,7 @@ As you can see, most of the times the data and the key do not have the same leng
 
 #### Why is it important ?
 
-[XOR](https://en.wikipedia.org/wiki/Exclusive_or) has an intresting property that make [XOR cipher](https://en.wikipedia.org/wiki/XOR_cipher) possible and XOR so usefull in computer science :
+[XOR](https://en.wikipedia.org/wiki/Exclusive_or) has an interesting property that make [XOR cipher](https://en.wikipedia.org/wiki/XOR_cipher) possible and XOR so useful in computer science :
 ```
 a == a ^ b ^ b
 > true
@@ -100,7 +100,7 @@ xor1 ^ xor2 == a ^ b
 > true
 ```
 ---
-Since the key length is lower than the data length, it means that during encryption each part (byte) of the key is going to be applied multiple time on the data.  
+Since the key length is lower than the data length, it means that during encryption each part (byte) of the key is applied to multiple parts of the data.  
 ```
 encryptedData[0] = data[0] ^ key[0]
 encryptedData[keyLength] = data[keyLength] ^ key[0]
@@ -113,7 +113,7 @@ As you can see this correspond to the two first lines of the previous property :
 * `data[keyLength]` is `b`
 * `key[0]` is `c`
 
-Wich means :
+⇒
 
 ```
 encryptedData[0] ^ encryptedData[keyLength] == data[0] ^ data[keyLength]
@@ -127,7 +127,7 @@ data[x*keyLength + z] ^ data[y*keyLength + z]
 > true
 ```
 
-This tool is not usefull in itself, but if we can somehow estimate the possible values for `data[x*keyLength + z]` and `data[y*keyLength + z]`, we may be able to deduce their real values.
+This tool is not useful in itself, but if we can somehow estimate the possible values for `data[x*keyLength + z]` and `data[y*keyLength + z]`, we may be able to deduce their real values.
 
 **Example :** 
 
@@ -187,7 +187,7 @@ We compute all possible values for `key[0]` ( equal to `data[0] ^ encryptedData[
 166 ^ 10 = 172
 ```
 
-To have a `data[0]` equal to `140` or to `166` we would need an invalid key. This proves that `data[0]` is not equal to any of thoses two values.
+To have a `data[0]` equal to `140` or to `166` we would need an invalid key. This proves that `data[0]` is not equal to any of those two values.
 
 ⇒
 
@@ -199,11 +199,11 @@ To have a `data[0]` equal to `140` or to `166` we would need an invalid key. Thi
 
 ### 3. The data cannot be guessed.
 
-To answer this hypothesis, we need to understand the format of dofus maps data.
+To answer this hypothesis, we need to understand the format of Dofus maps data.
 
-The data is divided in chunks of 10 bytes that each represents one cell. Thoses ten bytes all have a specific role in describing the cell : they inform the game if the cell is walkable, what is it's texture, etc..
+The data is divided in chunks of 10 bytes that each represents one cell. Those ten bytes all have a specific role in describing the cell : they inform the game if the cell is walkable, what is it's texture, etc..
 
-Here is an example of the begining of a decrypted map data containing 7 cells :
+Here is an example of the beginning of a decrypted map data containing 7 cells :
 
 <pre>
 <code><span style="color:	#a93226">HhfDaaaaaa</span><span style="color:	#9b59b6">HhfDeaaaaa</span><span style="color:#2980b9">HhfDeaaaaa</span><span style="color:#229954">HhfDeaazaa</span><span style="color:#f1c40f">HhfDeaazaa</span><span style="color:  #ba4a00">HhfDeaaaaa<span style="color: #34495e">HhfDeaaaaa</span></code>
@@ -211,18 +211,18 @@ Here is an example of the begining of a decrypted map data containing 7 cells :
 
 It is easy to see that some bytes of the cells tend to have the same values. Here, the first byte is always `H`.
 
-Thoses observations led me to make statistics for each of theses 10 bytes.
+Those observations led me to make statistics for each of theses 10 bytes.
 
 ![first byte of cells distribution](/images/dofus-maps/1bc-distribution.png#center)
 <center>*Distribution of values for the first byte in cells*</center>
 
-As you can see, for the first byte, there are only 6 possibilites, with 3 of them appearing in less than 1% of the cases.
+As you can see, for the first byte, there are only 6 possibilities, with 3 of them appearing in less than 1% of the cases.
 
 I did the same for the remaining 9 bytes and the number of possibilities ranges from 10 to 63. If you want to take a look at the full statistics, you can do so [here](/etc/cell_stats.json).
 
 #### Why is it important ?
 
-We now have [10 arrays](/etc/cell_stats.json) containing the possibles values for each byte of any cell. We will name the array containing these 10 arrays `possibleValuesForCellAtPosition[10][]`
+We now have [10 arrays](/etc/cell_stats.json) containing the possible values for each byte of any cell. We will name the array containing these 10 arrays `possibleValuesForCellAtPosition[10][]`
 
 We could use this to build an array of possible values for each byte of the data of a map.
 
@@ -239,7 +239,7 @@ func initDecryptedDataPossibilitiesUsingMethod3(int dataLength)
 
 ## Building the attack
 
-During our analysis of this XOR cipher implementation, we discovered 3 ways to narrow down the possible values for the decrypted data and therefore the key. The objective is now to merge all of this in an algorithm that will hopefully be able to reduces the possibles values for each part of the key to only one.
+During our analysis of this XOR cipher implementation, we discovered 3 ways to narrow down the possible values for the decrypted data and therefore the key. The objective is now to merge all of this in an algorithm that will hopefully be able to reduces the amount of possible values for each part of the key to only one.
 
 Here is my implementation at the highest level in pseudocode :
 
@@ -305,10 +305,10 @@ Percentage of the key found for keys with keyLength % 10 equal to
 9: 99.421586 % on average
 ```
 
-The results depends on the length of the key. This is due to the way method 1. works : the more diversity there is between the two arrays of possibilites we are trying to narrow, the better the result will be. If the keyLength % 10 = 0 we will always use method 1. with two bytes that correspond to the same cell. There will then be very little diversity in the two array of possibilities.
+The results depend on the length of the key. This is due to the way method 1. works : the more diversity between the two arrays of possibilities we are trying to narrow, the better the result will be. If the keyLength % 10 = 0 we will always use method 1. with two bytes that correspond to the same cell. There will then be very little diversity in the two array of possibilities.
 
 From there the best way to find the missing parts of the is to use a statistical approach.
 
 You can find an implementation of this attack on my [github](https://github.com/Omen-/dofus-key-finder).
 
-If you want more details on any part of this attack you can contact me, I will be more than happy to aswer !
+If you want more details on any part of this attack you can contact me, I will be more than happy to answer !
