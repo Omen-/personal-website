@@ -13,7 +13,14 @@
         <li><a href="{{.URL}}"> {{ .Name }} </a></li>
       {{- end }}
     </ul>
-
-    <p>{{ with .Site.Params.copyright }}{{.}}{{ else }}&copy; {{ now.Format "2006"}}. All rights reserved. {{end}}</p>
+    <p>{{ with .Site.Params.copyright }}{{.}}{{ else }}&copy; {{ now.Format "2006"}}. {{end}}</p>
+    <p class="sidebar-nav-item">
+      <a href="mailto:arthur@bell.al"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>&nbsp;
+      <a href="https://github.com/omen-"><i class="fa fa-github" aria-hidden="true"></i></a>&nbsp;
+      <!--<a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>-->
+      <a href="https://linkedin.com/in/arthur-bellal"><i class="fa fa-linkedin" aria-hidden="true"></i></a>&nbsp;
+      <a href="https://angel.co/arthur-bellal"><i class="fa fa-angellist" aria-hidden="true"></i></a>&nbsp;
+      <!--<a href="https://stackoverflow.com/users/"><i class="fa fa-stack-overflow" aria-hidden="true"></i></a>-->
+    </p>
   </div>
 </div>
